@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SilentSOS - Emergency Personal Safety Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(23, 23, 23, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(38, 38, 38, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.08);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+        }
+
+        .animate-pulse-ring {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col selection:bg-red-600 selection:text-white transition-colors duration-500">
+
+    <div id="decoy-overlay"
+        class="fixed inset-0 z-50 bg-neutral-900 text-white flex flex-col justify-between p-6 hidden select-none font-mono">
+        <div class="flex flex-col h-full justify-between max-w-md mx-auto w-full">
+            <div class="flex justify-between items-center bg-neutral-800 p-3.5 rounded-2xl border border-neutral-700">
+                <span class="text-xs text-neutral-400 font-sans"><i
+                        class="fa-solid fa-calculator text-amber-400 mr-2"></i>Calculator Standard</span>
+                <button onclick="toggleDecoyMode(false)"
+                    class="text-xs bg-neutral-700 hover:bg-neutral-600 text-emerald-400 font-sans px-3 py-1.5 rounded-xl transition">
+                    Exit Decoy
+                </button>
+            </div>
+            <div id="calc-display"
+                class="bg-black p-6 rounded-3xl text-right text-5xl font-light tracking-wider overflow-hidden border border-neutral-800 my-4 shadow-inner">
+                0
+            </div>
+            <div class="grid grid-cols-4 gap-3 font-sans">
+                <button onclick="calcInput('C')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition">C</button>
+                <button onclick="calcInput('(')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition">(</button>
+                <button onclick="calcInput(')')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-800 hover:bg-neutral-700 text-neutral-300 transition">)</button>
+                <button onclick="calcInput('/')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-amber-600 hover:bg-amber-500 transition">/</button>
+                <button onclick="calcInput('7')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">7</button>
+                <button onclick="calcInput('8')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">8</button>
+                <button onclick="calcInput('9')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">9</button>
+                <button onclick="calcInput('*')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-amber-600 hover:bg-amber-500 transition">×</button>
+                <button onclick="calcInput('4')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">4</button>
+                <button onclick="calcInput('5')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">5</button>
+                <button onclick="calcInput('6')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">6</button>
+                <button onclick="calcInput('-')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-amber-600 hover:bg-amber-500 transition">-</button>
+                <button onclick="calcInput('1')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">1</button>
+                <button onclick="calcInput('2')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">2</button>
+                <button onclick="calcInput('3')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">3</button>
+                <button onclick="calcInput('+')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-amber-600 hover:bg-amber-500 transition">+</button>
+                <button onclick="calcInput('0')"
+                    class="col-span-2 p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">0</button>
+                <button onclick="calcInput('.')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition">.</button>
+                <button onclick="calcInput('=')"
+                    class="p-4 rounded-2xl text-xl font-semibold bg-emerald-600 hover:bg-emerald-500 transition">=</button>
+            </div>
+            <div class="text-center text-xs text-neutral-500 font-sans mt-3">
+                System masked in decoy screen. Tap Exit Decoy to return to control panel.
+            </div>
+        </div>
+    </div>
+
+    <header id="app-header"
+        class="border-b border-neutral-800 px-4 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-40 bg-neutral-900/80 backdrop-blur-md transition-colors duration-500">
+        <div class="flex items-center space-x-3">
+            <div id="brand-badge"
+                class="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <i id="brand-icon" class="fa-solid fa-shield-halved text-lg"></i>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="font-bold tracking-tight text-lg">SilentSOS</h1>
+                    <span id="status-pill"
+                        class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        SYSTEM ARMED
+                    </span>
+                </div>
+                <p id="sub-status" class="text-xs text-neutral-400">Discrete personal safety & silent telemetry</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <button onclick="toggleDecoyMode(true)"
+                class="flex items-center space-x-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-xs px-3.5 py-2 rounded-xl font-medium transition shadow-sm">
+                <i class="fa-solid fa-calculator text-amber-400"></i>
+                <span class="hidden sm:inline">Decoy Screen</span>
+            </button>
+            <div
+                class="hidden md:flex items-center space-x-2 text-xs bg-neutral-800/80 px-3 py-2 rounded-xl border border-neutral-700 text-neutral-300">
+                <span id="gps-pulse" class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span id="header-gps-text">GPS Lock: Active</span>
+            </div>
+        </div>
+    </header>
+
+    <nav id="app-nav"
+        class="border-b border-neutral-800 px-4 lg:px-8 flex space-x-1 overflow-x-auto bg-neutral-900/50 backdrop-blur-md">
+        <button onclick="switchTab('sos')" id="nav-sos"
+            class="flex items-center space-x-2 py-3 px-4 text-xs font-semibold border-b-2 border-emerald-500 text-emerald-400 transition whitespace-nowrap">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>SOS Trigger</span>
+        </button>
+        <button onclick="switchTab('map')" id="nav-map"
+            class="flex items-center space-x-2 py-3 px-4 text-xs font-semibold border-b-2 border-transparent text-neutral-400 hover:text-neutral-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span>Live Radar & Map</span>
+        </button>
+        <button onclick="switchTab('contacts')" id="nav-contacts"
+            class="flex items-center space-x-2 py-3 px-4 text-xs font-semibold border-b-2 border-transparent text-neutral-400 hover:text-neutral-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-users"></i>
+            <span>Emergency Contacts</span>
+        </button>
+        <button onclick="switchTab('admin')" id="nav-admin"
+            class="flex items-center space-x-2 py-3 px-4 text-xs font-semibold border-b-2 border-transparent text-neutral-400 hover:text-neutral-200 transition whitespace-nowrap">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Dashboard & Logs</span>
+        </button>
+    </nav>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8">
+
+        <!-- TAB 1: SOS TRIGGER & LIFECYCLE -->
+        <div id="tab-sos-view" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+            <div id="sos-container"
+                class="lg:col-span-2 flex flex-col items-center justify-center glass-panel rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden shadow-2xl transition-all duration-500">
+                <div id="glow-effect"
+                    class="absolute inset-0 bg-red-600/0 pointer-events-none transition-all duration-500"></div>
+
+                <div class="max-w-md w-full mx-auto space-y-6 relative z-10">
+                    <div>
+                        <h2 id="trigger-title" class="text-2xl font-black tracking-tight mb-2">Discrete SOS Activation
+                        </h2>
+                        <p id="trigger-desc" class="text-sm text-neutral-400">Press & hold the button below for 2
+                            seconds. The emergency alert triggers silently with no audio or screen flasher.</p>
+                    </div>
+
+                    <!-- Press & Hold Interaction Area -->
+                    <div class="relative py-8 flex justify-center items-center">
+                        <div id="radar-ring"
+                            class="absolute w-60 h-60 rounded-full border border-red-500/30 animate-pulse-ring pointer-events-none">
+                        </div>
+
+                        <div class="relative w-56 h-56 flex items-center justify-center">
+                            <!-- Circular Progress SVG Ring -->
+                            <svg class="absolute inset-0 w-56 h-56 transform -rotate-90 pointer-events-none">
+                                <circle cx="112" cy="112" r="100" stroke="currentColor" stroke-width="8"
+                                    class="text-neutral-800" fill="transparent"></circle>
+                                <circle id="progress-circle" cx="112" cy="112" r="100" stroke="currentColor"
+                                    stroke-width="8" class="text-red-500 transition-all duration-75"
+                                    stroke-dasharray="628" stroke-dashoffset="628" fill="transparent"
+                                    stroke-linecap="round"></circle>
+                            </svg>
+
+                            <!-- Long Press Target Button -->
+                            <button id="sos-btn" onmousedown="startHold(event)" onmouseup="endHold(event)"
+                                onmouseleave="endHold(event)" ontouchstart="startHold(event)"
+                                ontouchend="endHold(event)"
+                                class="absolute inset-4 rounded-full flex flex-col items-center justify-center shadow-2xl transition-all transform active:scale-95 select-none bg-gradient-to-br from-red-600 hover:from-red-500 to-rose-800 hover:to-rose-700 text-white shadow-red-900/50 cursor-pointer">
+                                <i id="sos-btn-icon"
+                                    class="fa-solid fa-triangle-exclamation text-4xl mb-1 animate-bounce"></i>
+                                <span id="sos-btn-label" class="font-black text-xl tracking-wider">HOLD SOS</span>
+                                <span id="sos-btn-sub" class="text-[10px] uppercase font-semibold text-red-200 mt-1">2
+                                    Sec Long Press</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resolve Emergency Action -->
+                    <div id="resolve-box" class="hidden pt-4 animate-fade-in">
+                        <button onclick="resolveSOS()"
+                            class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-lg transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>I AM SAFE - RESOLVE ALERT</span>
+                        </button>
+                        <p class="text-xs text-neutral-400 mt-2">Sends instant stand-down signal to contacts & authority
+                            dispatchers.</p>
+                    </div>
+
+                    <!-- Safety Status Indicators -->
+                    <div class="grid grid-cols-2 gap-3 pt-4 border-t border-neutral-800 text-left">
+                        <div class="glass-card p-3 rounded-2xl">
+                            <div class="text-xs text-neutral-400">Audio Telemetry</div>
+                            <div class="text-sm font-semibold flex items-center space-x-1.5 text-emerald-400 mt-0.5">
+                                <i class="fa-solid fa-microphone-lines"></i>
+                                <span>Background Stream</span>
+                            </div>
+                        </div>
+                        <div class="glass-card p-3 rounded-2xl">
+                            <div class="text-xs text-neutral-400">Device Feedback</div>
+                            <div class="text-sm font-semibold flex items-center space-x-1.5 text-emerald-400 mt-0.5">
+                                <i class="fa-solid fa-eye-slash"></i>
+                                <span>Zero Visual / Alarm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Status Lifecycle Tracker -->
+            <div class="space-y-6">
+                <div class="glass-panel rounded-3xl p-6 shadow-xl">
+                    <h3
+                        class="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-4 flex items-center justify-between">
+                        <span>Alert Lifecycle State</span>
+                        <span id="lifecycle-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    </h3>
+
+                    <!-- Visual Lifecycle Timeline -->
+                    <div class="space-y-4">
+                        <div
+                            class="space-y-3 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-neutral-800">
+                            <div id="step-1" class="flex items-center space-x-3 text-xs relative z-10 opacity-40">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-neutral-300 font-bold">
+                                    <i class="fa-solid fa-1"></i></div>
+                                <div>
+                                    <div class="font-bold">Alert Triggered</div>
+                                    <div class="text-[10px] text-neutral-400">Long-press sequence initiated</div>
+                                </div>
+                            </div>
+                            <div id="step-2" class="flex items-center space-x-3 text-xs relative z-10 opacity-40">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-neutral-300 font-bold">
+                                    <i class="fa-solid fa-2"></i></div>
+                                <div>
+                                    <div class="font-bold">Notifications Sent</div>
+                                    <div class="text-[10px] text-neutral-400">SMS / Email dispatched</div>
+                                </div>
+                            </div>
+                            <div id="step-3" class="flex items-center space-x-3 text-xs relative z-10 opacity-40">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-neutral-300 font-bold">
+                                    <i class="fa-solid fa-3"></i></div>
+                                <div>
+                                    <div class="font-bold">Contact Acknowledged</div>
+                                    <div class="text-[10px] text-neutral-400">Guardian received ping</div>
+                                </div>
+                            </div>
+                            <div id="step-4" class="flex items-center space-x-3 text-xs relative z-10 opacity-40">
+                                <div
+                                    class="w-7 h-7 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-neutral-300 font-bold">
+                                    <i class="fa-solid fa-4"></i></div>
+                                <div>
+                                    <div class="font-bold">Authorities Dispatched</div>
+                                    <div class="text-[10px] text-neutral-400">112 emergency queue linked</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-neutral-800 flex justify-between items-center text-xs">
+                            <span class="text-neutral-400">Active Contacts:</span>
+                            <span id="active-contacts-badge" class="font-bold text-emerald-400">3 Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decoy Helper Banner -->
+                <div
+                    class="bg-gradient-to-br from-amber-950/40 to-neutral-900 border border-amber-900/40 rounded-3xl p-6 shadow-xl">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <i class="fa-solid fa-shield-cat text-amber-400 text-lg"></i>
+                        <h4 class="font-bold text-sm text-amber-200">Threat Approaching?</h4>
+                    </div>
+                    <p class="text-xs text-neutral-400 mb-4">
+                        Switch immediately to a standard calculator screen to prevent suspicion.
+                    </p>
+                    <button onclick="toggleDecoyMode(true)"
+                        class="w-full bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold py-3 rounded-xl transition shadow-md">
+                        Activate Decoy Cover
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="tab-map-view" class="space-y-6 hidden">
+            <div class="glass-panel rounded-3xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold">Live GPS & Coordinates Tracking</h2>
+                        <p class="text-xs text-neutral-400">Browser Geolocation API feed with automatic accuracy
+                            updates.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="toggleMockLocation()" id="mock-btn"
+                            class="text-xs px-3.5 py-2 rounded-xl font-medium border border-neutral-700 bg-neutral-800 hover:bg-neutral-700 transition">
+                            Toggle Real/Mock GPS
+                        </button>
+                        <button onclick="refreshLocation()"
+                            class="text-xs px-4 py-2 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-500 transition shadow-md">
+                            <i class="fa-solid fa-rotate mr-1.5"></i>Sync GPS
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Radar Display Screen -->
+                <div
+                    class="relative w-full h-96 rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 flex items-center justify-center shadow-inner">
+                    <div
+                        class="absolute inset-0 bg-[radial-gradient(#262626_1px,transparent_1px)] [background-size:24px_24px] opacity-40">
+                    </div>
+                    <div
+                        class="absolute w-64 h-64 rounded-full border border-emerald-500/20 animate-ping pointer-events-none">
+                    </div>
+                    <div class="absolute w-40 h-40 rounded-full border border-emerald-500/30"></div>
+
+                    <div class="z-10 flex flex-col items-center">
+                        <div class="relative">
+                            <span class="absolute -inset-2 rounded-full bg-emerald-500/20 animate-pulse"></span>
+                            <div
+                                class="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xl relative text-lg">
+                                <i class="fa-solid fa-location-crosshairs"></i>
+                            </div>
+                        </div>
+                        <div
+                            class="mt-4 bg-neutral-900/90 border border-neutral-700 px-5 py-3 rounded-2xl text-center shadow-2xl backdrop-blur-md">
+                            <div id="map-address" class="text-xs font-bold text-emerald-400">Hazratganj, Lucknow, UP
+                            </div>
+                            <div id="map-coords" class="text-[10px] font-mono text-neutral-400 mt-1">26.8467° N,
+                                80.9462° E • Precision: 4.2m</div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="absolute bottom-4 left-4 bg-neutral-900/80 backdrop-blur-md border border-neutral-800 p-3 rounded-xl text-xs space-y-1">
+                        <div class="text-neutral-400">Speed: <span class="text-white font-medium" id="speed-val">0
+                                km/h</span></div>
+                        <div class="text-neutral-400">Source: <span class="text-emerald-400 font-medium"
+                                id="source-val">Browser GPS</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-contacts-view" class="space-y-6 hidden">
+            <div class="glass-panel rounded-3xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold">Trusted Emergency Contacts</h2>
+                        <p class="text-xs text-neutral-400">Pings dispatched automatically via simulated SMS/Email on
+                            activation.</p>
+                    </div>
+                    <button onclick="openContactModal()"
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-md">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Add New Contact</span>
+                    </button>
+                </div>
+
+                <div id="contacts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic Contact Cards -->
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-admin-view" class="space-y-6 hidden">
+            <div class="glass-panel rounded-3xl p-6 shadow-xl">
+                <h2 class="text-xl font-bold mb-1">Admin Monitoring & Activity Log</h2>
+                <p class="text-xs text-neutral-400 mb-6">Real-time audit log and incident metrics.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="text-xs text-neutral-400">Total Safety Drills</div>
+                        <div class="text-2xl font-black text-neutral-100 mt-1" id="stat-drills">14</div>
+                        <div class="text-[10px] text-emerald-400 mt-1">100% System Armed</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="text-xs text-neutral-400">Avg Notification Speed</div>
+                        <div class="text-2xl font-black text-neutral-100 mt-1">1.2 sec</div>
+                        <div class="text-[10px] text-emerald-400 mt-1">Instant SMS Relay</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="text-xs text-neutral-400">Decoy Trigger Count</div>
+                        <div class="text-2xl font-black text-neutral-100 mt-1" id="stat-decoys">6</div>
+                        <div class="text-[10px] text-amber-400 mt-1">Discreet Screen Mask</div>
+                    </div>
+                </div>
+
+                <h3 class="text-sm font-bold uppercase tracking-wider text-neutral-400 mb-3">Time-stamped Event Stream
+                </h3>
+                <div id="log-container" class="space-y-2 font-mono text-xs max-h-80 overflow-y-auto pr-2">
+                    <!-- Dynamic Event Logs -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="contact-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <h3 class="text-lg font-bold">Add Trusted Emergency Contact</h3>
+            <form onsubmit="saveContact(event)" class="space-y-4">
+                <div>
+                    <label class="text-xs font-medium text-neutral-400 block mb-1">Full Name</label>
+                    <input type="text" id="m-name" required placeholder="e.g. Aarav Sharma"
+                        class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-neutral-400 block mb-1">Phone Number</label>
+                    <input type="tel" id="m-phone" required placeholder="+91 98765 43210"
+                        class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-neutral-400 block mb-1">Email Address</label>
+                    <input type="email" id="m-email" placeholder="aarav@example.com"
+                        class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-neutral-400 block mb-1">Relationship</label>
+                    <select id="m-rel"
+                        class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500">
+                        <option value="Spouse">Spouse</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Sibling">Sibling</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Authorities">Authorities</option>
+                    </select>
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeContactModal()"
+                        class="flex-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-semibold py-3 rounded-xl transition">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-3 rounded-xl transition shadow-md">Save
+                        Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="border-t border-neutral-800 py-4 text-center text-xs text-neutral-500 bg-neutral-900/30">
+        SilentSOS Safety Console • Encrypted Telemetry & Real-Time Distress Stream
+    </footer>
+
+    <script>
+        // State
+        let sosActive = false;
+        let holdTimer = null;
+        let holdProgress = 0;
+        let isMockLocation = true;
+        let calcVal = '0';
+
+        let contacts = [
+            { id: 1, name: 'Aarav Sharma', phone: '+91 98765 43210', email: 'aarav@example.com', relation: 'Spouse', active: true, notified: false },
+            { id: 2, name: 'Priya Verma', phone: '+91 87654 32109', email: 'priya@example.com', relation: 'Sibling', active: true, notified: false },
+            { id: 3, name: 'Local Emergency 112', phone: '112', email: 'dispatch@gov.in', relation: 'Authorities', active: true, notified: false }
+        ];
+
+        let logs = [
+            { id: 1, time: new Date().toLocaleTimeString(), text: 'SilentSOS armed and standing by.', type: 'info' }
+        ];
+
+        let coords = { lat: 26.8467, lng: 80.9462, accuracy: '4.2m', address: 'Hazratganj, Lucknow, UP' };
+
+        window.onload = function () {
+            renderContacts();
+            renderLogs();
+            initGeolocation();
+        };
+
+        // Navigation Tabs
+        function switchTab(tabKey) {
+            ['sos', 'map', 'contacts', 'admin'].forEach(k => {
+                document.getElementById(`tab-${k}-view`).classList.add('hidden');
+                document.getElementById(`nav-${k}`).className = "flex items-center space-x-2 py-3 px-4 text-xs font-semibold border-b-2 border-transparent text-neutral-400 hover:text-neutral-200 transition whitespace-nowrap";
+            });
+            document.getElementById(`tab-${tabKey}-view`).classList.remove('hidden');
+            const colorClass = sosActive ? 'border-white text-white' : 'border-emerald-500 text-emerald-400';
+            document.getElementById(`nav-${tabKey}`).className = `flex items-center space-x-2 py-3 px-4 text-xs font-semibold border-b-2 ${colorClass} transition whitespace-nowrap`;
+        }
+
+        // Decoy Screen Controller
+        function toggleDecoyMode(show) {
+            const el = document.getElementById('decoy-overlay');
+            if (show) {
+                el.classList.remove('hidden');
+                addLog('Decoy Calculator Cover activated.', 'warning');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function calcInput(v) {
+            const display = document.getElementById('calc-display');
+            if (v === 'C') calcVal = '0';
+            else if (v === '=') {
+                try { calcVal = eval(calcVal).toString(); } catch { calcVal = 'Error'; }
+            } else {
+                calcVal = calcVal === '0' ? v : calcVal + v;
+            }
+            display.innerText = calcVal;
+        }
+
+        // SOS Press & Hold Trigger Logic
+        function startHold(e) {
+            if (sosActive) return;
+            holdProgress = 0;
+            const circle = document.getElementById('progress-circle');
+
+            holdTimer = setInterval(() => {
+                holdProgress += 2.5;
+                circle.style.strokeDashoffset = 628 - (628 * holdProgress) / 100;
+
+                if (holdProgress >= 100) {
+                    clearInterval(holdTimer);
+                    triggerSOS();
+                }
+            }, 50);
+        }
+
+        function endHold(e) {
+            if (sosActive) return;
+            clearInterval(holdTimer);
+            holdProgress = 0;
+            document.getElementById('progress-circle').style.strokeDashoffset = 628;
+        }
+
+        // Activate Emergency SOS
+        function triggerSOS() {
+            sosActive = true;
+
+            // Shift Theme to High-Contrast Emergency Red
+            document.body.className = "bg-red-950 text-red-50 min-h-screen flex flex-col selection:bg-red-600 selection:text-white transition-colors duration-500";
+            document.getElementById('app-header').className = "border-b border-red-700 px-4 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-40 bg-red-900/90 backdrop-blur-md animate-pulse transition-colors duration-500";
+            document.getElementById('app-nav').className = "border-b border-red-900 px-4 lg:px-8 flex space-x-1 overflow-x-auto bg-red-950/80 backdrop-blur-md";
+            document.getElementById('sos-container').className = "lg:col-span-2 flex flex-col items-center justify-center bg-red-900/40 border border-red-700 rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden backdrop-blur-md shadow-2xl transition-colors duration-500";
+            document.getElementById('glow-effect').className = "absolute inset-0 bg-red-600/10 pointer-events-none animate-pulse";
+
+            document.getElementById('brand-badge').className = "p-2.5 rounded-xl bg-red-600 text-white shadow-lg";
+            document.getElementById('brand-icon').className = "fa-solid fa-triangle-exclamation text-lg animate-spin";
+            document.getElementById('status-pill').className = "text-xs px-2.5 py-0.5 rounded-full font-semibold bg-red-600 text-white";
+            document.getElementById('status-pill').innerText = "EMERGENCY ACTIVE";
+            document.getElementById('sub-status').innerText = "Broadcasting live distress telemetry...";
+
+            document.getElementById('trigger-title').innerText = "EMERGENCY MODE ENGAGED";
+            document.getElementById('trigger-desc').innerText = "Distress signals transmitting silently to trusted guardians.";
+
+            const btn = document.getElementById('sos-btn');
+            btn.className = "absolute inset-4 rounded-full flex flex-col items-center justify-center shadow-2xl transition-all transform active:scale-95 select-none bg-gradient-to-br from-red-600 to-rose-700 text-white animate-pulse shadow-red-600/50 cursor-pointer";
+            document.getElementById('sos-btn-label').innerText = "ACTIVE";
+            document.getElementById('sos-btn-sub').innerText = "Silent Stream On";
+
+            document.getElementById('resolve-box').classList.remove('hidden');
+            document.getElementById('lifecycle-dot').className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
+
+            updateStep('step-1', true);
+            addLog('EMERGENCY TRIGGERED: Silent SOS distress broadcast.', 'danger');
+
+            // Lifecycle simulation sequence
+            setTimeout(() => {
+                contacts = contacts.map(c => ({ ...c, notified: true }));
+                renderContacts();
+                updateStep('step-2', true);
+                addLog('SMS & In-App notifications delivered to contacts.', 'warning');
+            }, 2500);
+
+            setTimeout(() => {
+                updateStep('step-3', true);
+                addLog('Aarav Sharma acknowledged safety distress ping.', 'success');
+            }, 6000);
+
+            setTimeout(() => {
+                updateStep('step-4', true);
+                addLog('Local Dispatch 112 linked to coordinate stream.', 'info');
+            }, 10000);
+        }
+
+        // Resolve SOS Action
+        function resolveSOS() {
+            sosActive = false;
+            document.getElementById('progress-circle').style.strokeDashoffset = 628;
+
+            // Revert Theme
+            document.body.className = "bg-neutral-950 text-neutral-100 min-h-screen flex flex-col selection:bg-red-600 selection:text-white transition-colors duration-500";
+            document.getElementById('app-header').className = "border-b border-neutral-800 px-4 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-40 bg-neutral-900/80 backdrop-blur-md transition-colors duration-500";
+            document.getElementById('app-nav').className = "border-b border-neutral-800 px-4 lg:px-8 flex space-x-1 overflow-x-auto bg-neutral-900/50 backdrop-blur-md";
+            document.getElementById('sos-container').className = "lg:col-span-2 flex flex-col items-center justify-center glass-panel rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden shadow-2xl transition-all duration-500";
+            document.getElementById('glow-effect').className = "absolute inset-0 bg-red-600/0 pointer-events-none transition-all duration-500";
+
+            document.getElementById('brand-badge').className = "p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+            document.getElementById('brand-icon').className = "fa-solid fa-shield-halved text-lg";
+            document.getElementById('status-pill').className = "text-xs px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+            document.getElementById('status-pill').innerText = "SYSTEM ARMED";
+            document.getElementById('sub-status').innerText = "Discrete personal safety & silent telemetry";
+
+            document.getElementById('trigger-title').innerText = "Discrete SOS Activation";
+            document.getElementById('trigger-desc').innerText = "Press & hold the button below for 2 seconds. The emergency alert triggers silently with no audio or screen flasher.";
+
+            const btn = document.getElementById('sos-btn');
+            btn.className = "absolute inset-4 rounded-full flex flex-col items-center justify-center shadow-2xl transition-all transform active:scale-95 select-none bg-gradient-to-br from-red-600 hover:from-red-500 to-rose-800 hover:to-rose-700 text-white shadow-red-900/50 cursor-pointer";
+            document.getElementById('sos-btn-label').innerText = "HOLD SOS";
+            document.getElementById('sos-btn-sub').innerText = "2 Sec Long Press";
+
+            document.getElementById('resolve-box').classList.add('hidden');
+            document.getElementById('lifecycle-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+
+            ['step-1', 'step-2', 'step-3', 'step-4'].forEach(s => updateStep(s, false));
+            contacts = contacts.map(c => ({ ...c, notified: false }));
+            renderContacts();
+            addLog('Emergency marked RESOLVED. Stand-down broadcast sent.', 'success');
+        }
+
+        function updateStep(stepId, active) {
+            const el = document.getElementById(stepId);
+            if (active) {
+                el.classList.remove('opacity-40');
+                el.classList.add('text-emerald-400');
+            } else {
+                el.classList.add('opacity-40');
+                el.classList.remove('text-emerald-400');
+            }
+        }
+
+        // Location & Geolocation API
+        function initGeolocation() {
+            setInterval(() => {
+                if (isMockLocation) {
+                    coords.lat += (Math.random() - 0.5) * 0.00015;
+                    coords.lng += (Math.random() - 0.5) * 0.00015;
+                    coords.accuracy = (3 + Math.random() * 2).toFixed(1) + 'm';
+                }
+                updateLocationUI();
+            }, 3000);
+        }
+
+        function toggleMockLocation() {
+            isMockLocation = !isMockLocation;
+            document.getElementById('source-val').innerText = isMockLocation ? "Mock Simulated GPS" : "Browser Native GPS";
+            if (!isMockLocation && navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    coords.lat = pos.coords.latitude;
+                    coords.lng = pos.coords.longitude;
+                    coords.accuracy = pos.coords.accuracy.toFixed(1) + 'm';
+                    coords.address = "Current Hardware Location";
+                    updateLocationUI();
+                });
+            }
+        }
+
+        function refreshLocation() {
+            updateLocationUI();
+            addLog('GPS location manually synced.', 'info');
+        }
+
+        function updateLocationUI() {
+            document.getElementById('map-coords').innerText = `${coords.lat.toFixed(4)}° N, ${coords.lng.toFixed(4)}° E • Precision: ${coords.accuracy}`;
+            document.getElementById('map-address').innerText = coords.address;
+            document.getElementById('header-gps-text').innerText = `GPS Lock: ${coords.accuracy}`;
+        }
+
+        // Contacts Rendering & CRUD
+        function renderContacts() {
+            const grid = document.getElementById('contacts-grid');
+            grid.innerHTML = '';
+
+            let activeCount = 0;
+            contacts.forEach(c => {
+                if (c.active) activeCount++;
+                grid.innerHTML += `
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm border border-neutral-700/50">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-neutral-800 text-neutral-300 border border-neutral-700">${c.relation}</span>
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="toggleContactActive(${c.id})" class="text-xs ${c.active ? 'text-emerald-400' : 'text-neutral-500'}">
+                                        <i class="fa-solid fa-power-off"></i>
+                                    </button>
+                                    <button onclick="deleteContact(${c.id})" class="text-neutral-500 hover:text-red-400 transition text-xs">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h3 class="font-bold text-base text-neutral-100">${c.name}</h3>
+                            <div class="space-y-1 mt-3 text-xs text-neutral-400">
+                                <div class="flex items-center space-x-2"><i class="fa-solid fa-phone text-neutral-500"></i><span>${c.phone}</span></div>
+                                <div class="flex items-center space-x-2"><i class="fa-solid fa-envelope text-neutral-500"></i><span>${c.email || 'N/A'}</span></div>
+                            </div>
+                        </div>
+                        <div class="pt-3 border-t border-neutral-700/50 flex items-center justify-between text-xs">
+                            <span class="text-neutral-400">Dispatch Status:</span>
+                            <span class="font-semibold ${c.notified ? 'text-emerald-400' : 'text-neutral-400'}">
+                                ${c.notified ? 'Notified & Pinged' : c.active ? 'Armed' : 'Disabled'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('active-contacts-badge').innerText = `${activeCount} Ready`;
+        }
+
+        function openContactModal() { document.getElementById('contact-modal').classList.remove('hidden'); }
+        function closeContactModal() { document.getElementById('contact-modal').classList.add('hidden'); }
+
+        function saveContact(e) {
+            e.preventDefault();
+            contacts.push({
+                id: Date.now(),
+                name: document.getElementById('m-name').value,
+                phone: document.getElementById('m-phone').value,
+                email: document.getElementById('m-email').value,
+                relation: document.getElementById('m-rel').value,
+                active: true,
+                notified: false
+            });
+            closeContactModal();
+            renderContacts();
+            addLog('Added new contact to emergency dispatch list.', 'info');
+        }
+
+        function toggleContactActive(id) {
+            contacts = contacts.map(c => c.id === id ? { ...c, active: !c.active } : c);
+            renderContacts();
+        }
+
+        function deleteContact(id) {
+            contacts = contacts.filter(c => c.id !== id);
+            renderContacts();
+            addLog('Removed contact from emergency list.', 'warning');
+        }
+
+        // Logging System
+        function addLog(text, type) {
+            const time = new Date().toLocaleTimeString();
+            logs.unshift({ id: Date.now(), time, text, type });
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('log-container');
+            container.innerHTML = '';
+            logs.forEach(l => {
+                const badgeColor = l.type === 'danger' ? 'text-red-400 font-bold' : l.type === 'success' ? 'text-emerald-400 font-bold' : l.type === 'warning' ? 'text-amber-400' : 'text-neutral-300';
+                container.innerHTML += `
+                    <div class="p-3 bg-neutral-900/60 rounded-xl border border-neutral-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-neutral-500">[${l.time}]</span>
+                            <span class="${badgeColor}">${l.text}</span>
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 uppercase">${l.type}</span>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+
+</html>
